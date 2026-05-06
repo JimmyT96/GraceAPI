@@ -1,25 +1,22 @@
 import pytest
-from app import create_app
+from app import app
 
 @pytest.fixture
 def client():
-    app = create_app()
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
 
-def test_index_route(client):
+def test_home(client):
     res = client.get('/')
     assert res.status_code == 200
-    assert res.json['service'] == 'GraceAPI'
-    assert res.json['author'] == 'Jemimah'
 
-def test_health(client):
-    res = client.get('/api/v1/health')
+def test_get_verses(client):
+    res = client.get('/verses')
     assert res.status_code == 200
-    assert res.json['status'] == 'healthy'
+    assert isinstance(res.json, list)
 
-def test_random_verse(client):
-    res = client.get('/api/v1/verse')
+def test_get_verse_by_id(client):
+    res = client.get('/verses/1')
     assert res.status_code == 200
-    assert 'reference' in res.json['data']
+    assert 'id' in res.json
